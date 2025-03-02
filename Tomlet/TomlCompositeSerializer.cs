@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-
 using Tomlet.Attributes;
 using Tomlet.Extensions;
 using Tomlet.Models;
@@ -30,24 +29,23 @@ internal static class TomlCompositeSerializer
         {
             //Get all instance fields
             var memberFlags = BindingFlags.Public | BindingFlags.Instance;
-            if (!options.IgnoreNonPublicMembers)
-            {
+            if (!options.IgnoreNonPublicMembers) {
                 memberFlags |= BindingFlags.NonPublic;
             }
 
             var fields = type.GetFields(memberFlags);
             var fieldAttribs = fields
-                .ToDictionary(f => f, f => new { inline = GenericExtensions.GetCustomAttribute<TomlInlineCommentAttribute>(f), preceding = GenericExtensions.GetCustomAttribute<TomlPrecedingCommentAttribute>(f), field = GenericExtensions.GetCustomAttribute<TomlFieldAttribute>(f), noInline = GenericExtensions.GetCustomAttribute<TomlDoNotInlineObjectAttribute>(f) });
+                .ToDictionary(f => f, f => new {inline = GenericExtensions.GetCustomAttribute<TomlInlineCommentAttribute>(f), preceding = GenericExtensions.GetCustomAttribute<TomlPrecedingCommentAttribute>(f), field = GenericExtensions.GetCustomAttribute<TomlFieldAttribute>(f), noInline = GenericExtensions.GetCustomAttribute<TomlDoNotInlineObjectAttribute>(f)});
             var props = type.GetProperties(memberFlags)
                 .ToArray();
             var propAttribs = props
-                .ToDictionary(p => p, p => new { inline = GenericExtensions.GetCustomAttribute<TomlInlineCommentAttribute>(p), preceding = GenericExtensions.GetCustomAttribute<TomlPrecedingCommentAttribute>(p), prop = GenericExtensions.GetCustomAttribute<TomlPropertyAttribute>(p), noInline = GenericExtensions.GetCustomAttribute<TomlDoNotInlineObjectAttribute>(p) });
+                .ToDictionary(p => p, p => new {inline = GenericExtensions.GetCustomAttribute<TomlInlineCommentAttribute>(p), preceding = GenericExtensions.GetCustomAttribute<TomlPrecedingCommentAttribute>(p), prop = GenericExtensions.GetCustomAttribute<TomlPropertyAttribute>(p), noInline = GenericExtensions.GetCustomAttribute<TomlDoNotInlineObjectAttribute>(p)});
 
             var isForcedNoInline = GenericExtensions.GetCustomAttribute<TomlDoNotInlineObjectAttribute>(type) != null;
 
             //Ignore NonSerialized and CompilerGenerated fields.
-            fields = fields.Where(f => GenericExtensions.GetCustomAttribute<TomlNonSerializedAttribute>(f) == null
-                && GenericExtensions.GetCustomAttribute<CompilerGeneratedAttribute>(f) == null
+            fields = fields.Where(f => !(f.IsNotSerialized || GenericExtensions.GetCustomAttribute<TomlNonSerializedAttribute>(f) != null)
+                && GenericExtensions.GetCustomAttribute<CompilerGeneratedAttribute>(f) == null 
                 && !f.Name.Contains('<')).ToArray();
 
             //Ignore TomlNonSerializedAttribute Decorated Properties
@@ -61,7 +59,7 @@ internal static class TomlCompositeSerializer
                 if (instance == null)
                     throw new ArgumentNullException(nameof(instance), "Object being serialized is null. TOML does not support null values.");
 
-                var resultTable = new TomlTable { ForceNoInline = isForcedNoInline };
+                var resultTable = new TomlTable {ForceNoInline = isForcedNoInline};
 
                 foreach (var field in fields)
                 {
@@ -71,14 +69,13 @@ internal static class TomlCompositeSerializer
                         continue; //Skip nulls - TOML doesn't support them.
 
                     var tomlValue = TomlSerializationMethods.GetSerializer(field.FieldType, options).Invoke(fieldValue);
-
-                    if (tomlValue == null)
+                    
+                    if(tomlValue == null)
                         continue;
-
+                    
                     var thisFieldAttribs = fieldAttribs[field];
 
-                    var name = thisFieldAttribs.field?.GetMappedString() ?? field.Name;
-                    if (resultTable.ContainsKey(name))
+                    if (resultTable.ContainsKey(field.Name))
                         //Do not overwrite fields if they have the same name as something already in the table
                         //This fixes serializing types which re-declare a field using the `new` keyword, overwriting a field of the same name
                         //in its supertype. 
@@ -86,33 +83,33 @@ internal static class TomlCompositeSerializer
 
                     tomlValue.Comments.InlineComment = thisFieldAttribs.inline?.Comment;
                     tomlValue.Comments.PrecedingComment = thisFieldAttribs.preceding?.Comment;
-
-                    if (thisFieldAttribs.noInline != null && tomlValue is TomlTable table)
+                    
+                    if(thisFieldAttribs.noInline != null && tomlValue is TomlTable table)
                         table.ForceNoInline = true;
 
-                    resultTable.PutValue(name, tomlValue);
+                    resultTable.PutValue(thisFieldAttribs.field?.GetMappedString() ?? field.Name, tomlValue);
                 }
 
                 foreach (var prop in props)
                 {
-                    if (prop.GetGetMethod(true) == null)
+                    if(prop.GetGetMethod(true) == null)
                         continue; //Skip properties without a getter
-
-                    if (prop.Name == "EqualityContract")
+                    
+                    if(prop.Name == "EqualityContract")
                         continue; //Skip record equality contract property. Wish there was a better way to do this.
-
+                    
                     var propValue = prop.GetValue(instance, null);
-
-                    if (propValue == null)
+                    
+                    if(propValue == null)
                         continue;
-
+                    
                     var tomlValue = TomlSerializationMethods.GetSerializer(prop.PropertyType, options).Invoke(propValue);
 
-                    if (tomlValue == null)
+                    if (tomlValue == null) 
                         continue;
-
+                    
                     var thisPropAttribs = propAttribs[prop];
-
+                    
                     tomlValue.Comments.InlineComment = thisPropAttribs.inline?.Comment;
                     tomlValue.Comments.PrecedingComment = thisPropAttribs.preceding?.Comment;
 

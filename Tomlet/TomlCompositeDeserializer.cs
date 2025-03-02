@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-
 using Tomlet.Attributes;
 using Tomlet.Exceptions;
 using Tomlet.Extensions;
@@ -35,9 +34,9 @@ internal static class TomlCompositeDeserializer
                 }
                 catch (Exception)
                 {
-                    if (options.IgnoreInvalidEnumValues)
+                    if(options.IgnoreInvalidEnumValues)
                         return Enum.GetValues(type).GetValue(0)!;
-
+                    
                     throw new TomlEnumParseException(enumName, type);
                 }
             };
@@ -46,15 +45,15 @@ internal static class TomlCompositeDeserializer
         {
             //Get all instance fields
             var memberFlags = BindingFlags.Public | BindingFlags.Instance;
-            if (!options.IgnoreNonPublicMembers)
-            {
+            if (!options.IgnoreNonPublicMembers) {
                 memberFlags |= BindingFlags.NonPublic;
             }
 
             var fields = type.GetFields(memberFlags);
 
             //Ignore NonSerialized and CompilerGenerated fields.
-            var fieldsDict = fields.Where(f => GenericExtensions.GetCustomAttribute<CompilerGeneratedAttribute>(f) == null)
+            var fieldsDict = fields
+                .Where(f => !f.IsNotSerialized && GenericExtensions.GetCustomAttribute<CompilerGeneratedAttribute>(f) == null)
                 .Select(f => new KeyValuePair<FieldInfo, TomlFieldAttribute?>(f, GenericExtensions.GetCustomAttribute<TomlFieldAttribute>(f)))
                 .ToDictionary(tuple => tuple.Key, tuple => tuple.Value);
 
@@ -66,7 +65,7 @@ internal static class TomlCompositeDeserializer
                 .Select(p => new KeyValuePair<PropertyInfo, TomlPropertyAttribute?>(p, GenericExtensions.GetCustomAttribute<TomlPropertyAttribute>(p)))
                 .ToDictionary(tuple => tuple.Key, tuple => tuple.Value);
 
-            if (fields.Length + propsDict.Count == 0)
+            if (fieldsDict.Count + propsDict.Count == 0)
                 return value => CreateInstance(type, value, options, out _);
 
             deserializer = value =>
@@ -81,7 +80,7 @@ internal static class TomlCompositeDeserializer
                     var name = attribute?.GetMappedString() ?? field.Name;
                     if (!options.OverrideConstructorValues && assignedMembers.Contains(name))
                         continue;
-
+                        
                     if (!table.TryGetValue(name, out var entry))
                         continue; //TODO: Do we want to make this configurable? As in, throw exception if data is missing?
 
@@ -103,7 +102,7 @@ internal static class TomlCompositeDeserializer
                     var name = attribute?.GetMappedString() ?? prop.Name;
                     if (!options.OverrideConstructorValues && assignedMembers.Contains(name))
                         continue;
-
+                        
                     if (!table.TryGetValue(name, out var entry))
                         continue; //TODO: As above, configurable?
 
@@ -140,7 +139,7 @@ internal static class TomlCompositeDeserializer
     {
         if (tomlValue is not TomlTable table)
             throw new TomlTypeMismatchException(typeof(TomlTable), tomlValue.GetType(), type);
-
+        
         if (!type.TryGetBestMatchConstructor(out var constructor))
         {
             throw new TomlInstantiationException();
@@ -159,7 +158,7 @@ internal static class TomlCompositeDeserializer
         {
             var parameter = parameters[i];
             object argument;
-
+            
             if (!table.TryGetValue(parameter.Name!.ToPascalCase(), out var entry))
                 continue;
 
