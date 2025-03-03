@@ -22,7 +22,7 @@
         <RepositoryUrl>https://github.com/RocketWerkz/Tomlet.git</RepositoryUrl>
         <TargetFrameworks>net9.0</TargetFrameworks>
         <Title>Tomlet</Title>
-        <Revision Condition="'$(Revision)' == ''">$([MSBuild]::Divide($([System.Environment]::TickCount), 65536).ToString("D"))</Revision>
+        <Revision Condition="'$(Revision)' == ''">$(GITHUB_RUN_ATTEMPT)</Revision>
         <Version>6.0.0.$(Revision)</Version>
         <IsTrimmable>true</IsTrimmable>
         <NoWarn>SYSLIB0050</NoWarn>
