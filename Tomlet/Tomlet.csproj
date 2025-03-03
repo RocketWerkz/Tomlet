@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <Authors>Sam Byass;Rocketwerkz</Authors>
         <Company></Company>
@@ -23,7 +22,8 @@
         <RepositoryUrl>https://github.com/RocketWerkz/Tomlet.git</RepositoryUrl>
         <TargetFrameworks>net9.0</TargetFrameworks>
         <Title>Tomlet</Title>
-        <Version>6.0.0</Version>
+        <Revision Condition="'$(Revision)' == ''">$([MSBuild]::Divide($([System.Environment]::TickCount), 65536).ToString("D"))</Revision>
+        <Version>6.0.0.$(Revision)</Version>
         <IsTrimmable>true</IsTrimmable>
         <NoWarn>SYSLIB0050</NoWarn>
 
