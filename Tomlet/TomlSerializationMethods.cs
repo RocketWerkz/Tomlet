@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-
 using Tomlet.Exceptions;
 using Tomlet.Extensions;
 using Tomlet.Models;
@@ -17,7 +16,7 @@ public static class TomlSerializationMethods
 #if MODERN_DOTNET
     internal const DynamicallyAccessedMemberTypes MainDeserializerAccessedMemberTypes = DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.NonPublicFields | DynamicallyAccessedMemberTypes.NonPublicProperties;
 #endif
-
+        
     private static MethodInfo _stringKeyedDictionaryMethod = typeof(TomlSerializationMethods).GetMethod(nameof(StringKeyedDictionaryDeserializerFor), BindingFlags.Static | BindingFlags.NonPublic)!;
     private static MethodInfo _primitiveKeyedDictionaryMethod = typeof(TomlSerializationMethods).GetMethod(nameof(PrimitiveKeyedDictionaryDeserializerFor), BindingFlags.Static | BindingFlags.NonPublic)!;
     private static MethodInfo _genericDictionarySerializerMethod = typeof(TomlSerializationMethods).GetMethod(nameof(GenericDictionarySerializer), BindingFlags.Static | BindingFlags.NonPublic)!;
@@ -97,12 +96,12 @@ public static class TomlSerializationMethods
 #endif
     {
         options ??= TomlSerializerOptions.Default;
-        if (type.IsPrimitive)
+        if(type.IsPrimitive)
             throw new ArgumentException("Can't use reflection-based serializer for primitive types.", nameof(type));
-
+            
         return TomlCompositeSerializer.For(type, options);
     }
-
+        
     /// <summary>
     /// Returns the default (reflection-based) deserializer for the given type. Can be useful if you're implementing your own custom deserializer but want to use the default behavior (e.g. to extend it or to use it as a fallback).
     /// </summary>
@@ -117,9 +116,9 @@ public static class TomlSerializationMethods
 #endif
     {
         options ??= TomlSerializerOptions.Default;
-        if (type.IsPrimitive)
+        if(type.IsPrimitive)
             throw new ArgumentException("Can't use reflection-based deserializer for primitive types.", nameof(type));
-
+            
         return TomlCompositeDeserializer.For(type, options);
     }
 
@@ -133,7 +132,7 @@ public static class TomlSerializationMethods
 #endif
     {
         options ??= TomlSerializerOptions.Default;
-
+            
         if (Serializers.TryGetValue(t, out var value))
             return (Serialize<object>)value;
 
@@ -158,7 +157,7 @@ public static class TomlSerializationMethods
                 return NullableSerializerFor(t, options);
             }
         }
-
+            
         //Now we've got dicts out of the way we can check if we're dealing with something that's IEnumerable and if so serialize as an array. We do this only *after* checking for dictionaries, because we don't want to serialize dictionaries as enumerables (i.e. table-arrays)
         if (typeof(IEnumerable).IsAssignableFrom(t))
         {
@@ -183,12 +182,12 @@ public static class TomlSerializationMethods
 #endif
     {
         options ??= TomlSerializerOptions.Default;
-
+            
         if (Deserializers.TryGetValue(t, out var value))
             return (Deserialize<object>)value;
 
         //We allow deserializing to IEnumerable fields/props, by setting them an array. We DO NOT do anything for classes that implement IEnumerable, though, because that would mess with deserializing lists, dictionaries, etc.
-        if (t.IsArray || t.IsInterface && typeof(IEnumerable).IsAssignableFrom(t))
+        if (t.IsArray || t.IsInterface && typeof(IEnumerable).IsAssignableFrom(t)) 
         {
             var elementType = t.IsInterface ? t.GetGenericArguments()[0] : t.GetElementType()!;
             var arrayDeserializer = ArrayDeserializerFor(elementType, options);
@@ -202,8 +201,8 @@ public static class TomlSerializationMethods
             Deserializers[t] = listDeserializer;
             return listDeserializer;
         }
-
-        if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>) && t.GetGenericArguments() is { Length: 1 })
+            
+        if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>) && t.GetGenericArguments() is {Length: 1})
         {
             var nullableDeserializer = NullableDeserializerFor(t, options);
             Deserializers[t] = nullableDeserializer;
@@ -214,13 +213,13 @@ public static class TomlSerializationMethods
         {
             if (genericArgs[0] == typeof(string))
             {
-                return (Deserialize<object>)_stringKeyedDictionaryMethod.MakeGenericMethod(genericArgs[1]).Invoke(null, new object[] { options })!;
+                return (Deserialize<object>)_stringKeyedDictionaryMethod.MakeGenericMethod(genericArgs[1]).Invoke(null, new object[]{options})!;
             }
 
             if (genericArgs[0].IsIntegerType() || genericArgs[0] == typeof(bool) || genericArgs[0] == typeof(char))
             {
                 // float primitives not supported due to decimal point causing issues
-                return (Deserialize<object>)_primitiveKeyedDictionaryMethod.MakeGenericMethod(genericArgs).Invoke(null, new object[] { options })!;
+                return (Deserialize<object>)_primitiveKeyedDictionaryMethod.MakeGenericMethod(genericArgs).Invoke(null, new object[]{options})!;
             }
         }
 
@@ -260,7 +259,7 @@ public static class TomlSerializationMethods
 
         return ret;
     }
-
+        
 #if MODERN_DOTNET
     [UnconditionalSuppressMessage("AOT", "IL2060", Justification = "The nullableType's underlying T must have been used somewhere in the consuming code in order for this method to be called, so the dynamic code requirement is already satisfied.")]
 #if NET7_0_OR_GREATER
@@ -272,11 +271,11 @@ public static class TomlSerializationMethods
 #endif
     {
         var serializer = _genericNullableSerializerMethod.MakeGenericMethod(nullableType.GetGenericArguments());
-
+                    
         var del = Delegate.CreateDelegate(typeof(ComplexSerialize<>).MakeGenericType(nullableType), serializer);
         var ret = (Serialize<object>)(dict => (TomlValue?)del.DynamicInvoke(dict, options));
         Serializers[nullableType] = ret;
-
+                    
         return ret;
     }
 
@@ -330,7 +329,7 @@ public static class TomlSerializationMethods
             return ret;
         };
     }
-
+        
 #if MODERN_DOTNET
     [UnconditionalSuppressMessage("AOT", "IL2062", Justification = "The nullableType's underlying T must have been used somewhere in the consuming code in order for this method to be called, so the dynamic code requirement is already satisfied.")]
 #if NET7_0_OR_GREATER        
@@ -343,7 +342,7 @@ public static class TomlSerializationMethods
     {
         var elementType = nullableType.GetGenericArguments()[0];
         var elementDeserializer = GetDeserializer(elementType, options);
-
+            
         return value =>
         {
             //If we're deserializing, we know the value is not null
@@ -424,7 +423,7 @@ public static class TomlSerializationMethods
 #endif
     {
         var elementSerializer = GetSerializer(typeof(T), options);
-
+            
         if (nullable.HasValue)
             return elementSerializer(nullable.Value);
 
@@ -446,15 +445,15 @@ public static class TomlSerializationMethods
         foreach (var entry in dict)
         {
             var keyAsString = entry.Key.ToString();
-
-            if (keyAsString == null)
+                
+            if(keyAsString == null)
                 continue;
 
             var value = valueSerializer(entry.Value);
-
-            if (value == null)
+                
+            if(value == null)
                 continue;
-
+                
             ret.PutValue(keyAsString, value, true);
         }
 
@@ -516,7 +515,7 @@ public static class TomlSerializationMethods
                 if (tomlValue == null)
                     //Skip null values
                     continue;
-
+                    
                 table.PutValue(keys[i], tomlValue, true);
             }
 
