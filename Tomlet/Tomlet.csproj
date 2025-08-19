@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <Authors>Sam Byass</Authors>
-        <Company>N/A</Company>
+        <Authors>Sam Byass;Rocketwerkz</Authors>
+        <Company></Company>
         <Configurations>Debug;Release</Configurations>
         <DebugType>embedded</DebugType>
         <Description>
@@ -11,19 +10,20 @@
         </Description>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <LangVersion>10</LangVersion>
+        <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
-        <PackageId>Samboy063.Tomlet</PackageId>
+        <PackageId>RocketWerkz.Tomlet</PackageId>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/SamboyCoding/Tomlet</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/RocketWerkz/Tomlet</PackageProjectUrl>
         <PackageTags>toml</PackageTags>
         <Platforms>AnyCPU</Platforms>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/SamboyCoding/Tomlet.git</RepositoryUrl>
-        <TargetFrameworks>net6;net7;net8;net9;netstandard2.0;netframework3.5</TargetFrameworks>
+        <RepositoryUrl>https://github.com/RocketWerkz/Tomlet.git</RepositoryUrl>
+        <TargetFrameworks>net9.0</TargetFrameworks>
         <Title>Tomlet</Title>
         <Version>6.1.0</Version>
+        <Revision Condition="'$(Revision)' == ''">$(GITHUB_RUN_NUMBER)</Revision>
         <IsTrimmable>true</IsTrimmable>
         <NoWarn>SYSLIB0050</NoWarn>
 
