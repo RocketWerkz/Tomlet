@@ -22,7 +22,7 @@
         <RepositoryUrl>https://github.com/RocketWerkz/Tomlet.git</RepositoryUrl>
         <TargetFrameworks>net9.0</TargetFrameworks>
         <Title>Tomlet</Title>
-        <Version>6.1.0</Version>
+        <Version>6.2.0</Version>
         <Revision Condition="'$(Revision)' == ''">$(GITHUB_RUN_NUMBER)</Revision>
         <IsTrimmable>true</IsTrimmable>
         <NoWarn>SYSLIB0050</NoWarn>
