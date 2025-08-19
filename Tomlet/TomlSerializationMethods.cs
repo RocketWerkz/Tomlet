@@ -388,28 +388,36 @@ public static class TomlSerializationMethods
             if (value is not TomlTable table)
                 throw new TomlTypeMismatchException(typeof(TomlTable), value.GetType(), typeof(Dictionary<TKey, TValue>));
 
-            return table.Entries.ToDictionary(
-                entry =>
+            if (!type.IsEnum)
+            {
+                return table.Entries.ToDictionary(entry => (TKey)(entry.Key as IConvertible).ToType(typeof(TKey), CultureInfo.InvariantCulture),
+                    entry => (TValue)valueDeserializer(entry.Value));
+            }
+            
+            Dictionary<TKey, TValue> result = new(table.Entries.Count);
+
+            foreach (var entry in table.Entries)
+            {
+                TKey key;
+                
+                try
                 {
-                    if (!type.IsEnum)
-                    {
-                        return (TKey)(entry.Key as IConvertible).ToType(typeof(TKey), CultureInfo.InvariantCulture);
-                    }
-
-                    try
-                    {
-                        return (TKey)Enum.Parse(type, entry.Key, true);
-                    }
-                    catch (ArgumentException)
-                    {
-                        if (options.IgnoreInvalidEnumValues)
-                            return (TKey)Enum.GetValues(type).GetValue(0)!;
-
+                    key = (TKey)Enum.Parse(type, entry.Key, true);
+                }
+                catch (ArgumentException)
+                {
+                    if (options.SkipInvalidEnumKeys)
+                        continue;
+                    if (options.IgnoreInvalidEnumValues)
+                        key = (TKey)Enum.GetValues(type).GetValue(0)!;
+                    else
                         throw new TomlEnumParseException(entry.Key, typeof(TKey));
-                    }
-                },
-                entry => (TValue)valueDeserializer(entry.Value)
-            );
+                }
+                
+                result[key] = (TValue)valueDeserializer(entry.Value);
+            }
+
+            return result;
         };
     }
 

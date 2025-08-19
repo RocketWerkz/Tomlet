@@ -18,4 +18,9 @@ public class TomlSerializerOptions
     /// When set to true, the deserializer will ignore invalid enum values (and they will be implicitly left at their default value). When set to false, an exception will be thrown if the enum value is not found.
     /// </summary>
     public bool IgnoreInvalidEnumValues { get; set; } = false;
+    
+    /// <summary>
+    /// When set to true, the deserializer will skip invalid enum values when deserializing enum keys in tables. When set to false, an exception will be thrown if the enum key is not found.
+    /// </summary>
+    public bool SkipInvalidEnumKeys { get; set; } = false;
 }
