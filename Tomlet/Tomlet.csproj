@@ -1,36 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Authors>Sam Byass;Rocketwerkz</Authors>
-        <Company></Company>
         <Configurations>Debug;Release</Configurations>
+		<Platforms>AnyCPU</Platforms>
         <DebugType>embedded</DebugType>
-        <Description>
-            Tomlet allows consumption and creation of TOML files (often used as configuration files) in .NET applications.
-            It supports serialization and deserialization of objects to and from TOML, and is compliant with version 1.0.0 of the TOML specification.
-        </Description>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <LangVersion>13</LangVersion>
         <Nullable>enable</Nullable>
-        <PackageId>RocketWerkz.Tomlet</PackageId>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/RocketWerkz/Tomlet</PackageProjectUrl>
-        <PackageTags>toml</PackageTags>
-        <Platforms>AnyCPU</Platforms>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/RocketWerkz/Tomlet.git</RepositoryUrl>
         <TargetFrameworks>net9.0</TargetFrameworks>
         <Title>Tomlet</Title>
         <Version>6.2.0</Version>
         <Revision Condition="'$(Revision)' == ''">$(GITHUB_RUN_NUMBER)</Revision>
         <IsTrimmable>true</IsTrimmable>
         <NoWarn>SYSLIB0050</NoWarn>
-
         <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        
         <DefineConstants Condition="'$(TargetFramework)' != 'netframework3.5' And '$(TargetFramework)' != 'netstandard2.0'">MODERN_DOTNET</DefineConstants>
+		<PackageId>RocketWerkz.Tomlet</PackageId>
+		<Authors>Sam Byass;Rocketwerkz</Authors>
+        <Company>Rocketwerkz</Company>        
+        <Description>A fork of SamboyCoding/Tomlet for applications built with BRUTAL.</Description>              
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>toml</PackageTags>        
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/RocketWerkz/Tomlet</RepositoryUrl>
+		<Copyright>Copyright © 2026 RocketWerkz. All rights reserved.</Copyright>
+		<PackageReadmeFile>README_trimmed_for_nuget.md</PackageReadmeFile>
     </PropertyGroup>
+    <ItemGroup>
+        <None Include="../README_trimmed_for_nuget.md" Pack="true" PackagePath="" />
+        <None Include="LICENSES/TOMLET-THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="LICENSES/" />
+    </ItemGroup>	
 
     <ItemGroup>
         <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1">
