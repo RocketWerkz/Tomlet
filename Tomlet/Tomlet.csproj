@@ -1,43 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <Configurations>Debug;Release</Configurations>
-		<Platforms>AnyCPU</Platforms>
-        <DebugType>embedded</DebugType>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <LangVersion>13</LangVersion>
-        <Nullable>enable</Nullable>
-        <TargetFrameworks>net9.0</TargetFrameworks>
-        <Title>Tomlet</Title>
-        <Version>6.2.0</Version>
-        <Revision Condition="'$(Revision)' == ''">$(GITHUB_RUN_NUMBER)</Revision>
-        <IsTrimmable>true</IsTrimmable>
-        <NoWarn>SYSLIB0050</NoWarn>
-        <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
-        <DefineConstants Condition="'$(TargetFramework)' != 'netframework3.5' And '$(TargetFramework)' != 'netstandard2.0'">MODERN_DOTNET</DefineConstants>
-		<PackageId>RocketWerkz.Tomlet</PackageId>
-		<Authors>Sam Byass;Rocketwerkz</Authors>
-        <Company>Rocketwerkz</Company>        
-        <Description>A fork of SamboyCoding/Tomlet for applications built with BRUTAL.</Description>              
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageTags>toml</PackageTags>        
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>https://github.com/RocketWerkz/Tomlet</RepositoryUrl>
-		<Copyright>Copyright © 2026 RocketWerkz. All rights reserved.</Copyright>
-		<PackageReadmeFile>README_trimmed_for_nuget.md</PackageReadmeFile>
-    </PropertyGroup>
-    <ItemGroup>
-        <None Include="../README_trimmed_for_nuget.md" Pack="true" PackagePath="" />
-        <None Include="LICENSES/TOMLET-THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="LICENSES/" />
-    </ItemGroup>	
-
-    <ItemGroup>
-        <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    </ItemGroup>
-
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
+    <DebugType>embedded</DebugType>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>13</LangVersion>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net9.0</TargetFrameworks>
+    <Title>Tomlet</Title>
+    <Version>6.2.0</Version>
+    <Revision Condition="'$(Revision)' == ''">$(GITHUB_RUN_NUMBER)</Revision>
+    <IsTrimmable>true</IsTrimmable>
+    <NoWarn>SYSLIB0050</NoWarn>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <DefineConstants Condition="'$(TargetFramework)' != 'netframework3.5' And '$(TargetFramework)' != 'netstandard2.0'">MODERN_DOTNET</DefineConstants>
+    <PackageId>RocketWerkz.Tomlet</PackageId>
+    <Authors>Sam Byass;Rocketwerkz</Authors>
+    <Company>Rocketwerkz</Company>
+    <Description>A fork of SamboyCoding/Tomlet for applications built with BRUTAL.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>rocketwerkz;brutal;tomlet;asset;data;markup;library</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/RocketWerkz/Tomlet</RepositoryUrl>
+    <Copyright>Copyright © 2026 RocketWerkz. All rights reserved.</Copyright>
+    <PackageReadmeFile>README_trimmed_for_nuget.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../README_trimmed_for_nuget.md" Pack="true" PackagePath="" />
+    <None Include="LICENSES/TOMLET-THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="LICENSES/" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+  </ItemGroup>
 </Project>
